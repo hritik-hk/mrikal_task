@@ -81,6 +81,7 @@ const redirectToOriginalUrl = async (req: Request, res: Response) => {
     if (longUrl) {
       //push visit update to queue
       visitQueue.add("visit-processing-queue", {
+        shortCode: shortCode,
         clientIp: req.clientIp,
         userAgent: req.headers["user-agent"],
       });
@@ -96,6 +97,7 @@ const redirectToOriginalUrl = async (req: Request, res: Response) => {
 
     //push visit update to queue
     visitQueue.add("visit-processing-queue", {
+      shortCode: shortCode,
       clientIp: req.clientIp,
       userAgent: req.headers["user-agent"],
     });
