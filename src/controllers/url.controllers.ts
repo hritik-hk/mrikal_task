@@ -70,15 +70,12 @@ const redirectToOriginalUrl = async (req: Request, res: Response) => {
     const shortCode = req.params.shortCode;
 
     //find in redis
-    let longUrl = null;
-
     //@ts-ignore
-    redis.get(shortCode).then((result) => {
-      longUrl = result;
-    });
+    const longUrl = await redis.get(shortCode);
 
     // To Do: refactor code- remove repition
     if (longUrl) {
+      console.log("added job from redis");
       //push visit update to queue
       visitQueue.add("visit-processing-queue", {
         shortCode: shortCode,
@@ -94,6 +91,8 @@ const redirectToOriginalUrl = async (req: Request, res: Response) => {
     if (!url) {
       return res.status(400).json({ error: "invalid short url" });
     }
+
+    console.log("added job from db");
 
     //push visit update to queue
     visitQueue.add("visit-processing-queue", {
