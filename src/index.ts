@@ -23,6 +23,9 @@ app.use(cors());
 app.use(express.json());
 app.use(requestIp.mw());
 
+app.get("/", (req, res) => {
+  res.status(200).json({ health: "backend is up" });
+});
 app.use("/", urlRouter);
 app.use("/analytics", analyticsRouter);
 
