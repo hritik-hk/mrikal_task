@@ -23,8 +23,8 @@ app.use(cors());
 app.use(express.json());
 app.use(requestIp.mw());
 
-app.use("/url", urlRouter);
-app.use("/api/analytics", analyticsRouter);
+app.use("/", urlRouter);
+app.use("/analytics", analyticsRouter);
 
 app.listen(PORT, () => {
   console.log(`server started at PORT: ${PORT}`);

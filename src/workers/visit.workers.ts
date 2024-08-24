@@ -21,7 +21,7 @@ await connectToDB();
 
 //@ts-ignore
 const processUrlVisit = async (visit) => {
-  const { shortCode, clientIp, userAgent } = visit.data;
+  const { shortCode, clientIp, userAgent, deviceType } = visit.data;
 
   const url = await Url.findOne({ shortCode: shortCode });
 
@@ -30,7 +30,7 @@ const processUrlVisit = async (visit) => {
     return;
   }
 
-  //find unique visitors
+  //find if visitors is unique
   let uniqueVisitor = 0;
   let uniqueVisitorIdx = url.visitHistory.findIndex((visit) => {
     return visit.clientIp === clientIp && visit.userAgent == userAgent;
@@ -40,15 +40,23 @@ const processUrlVisit = async (visit) => {
     uniqueVisitor = 1;
   }
 
+  const isMobile: number = deviceType === "mobile" ? 1 : 0;
+  const isDesktop: number = deviceType !== "mobile" ? 1 : 0;
+
   const updated = {
+    deviceTypes: {
+      desktop: (url.deviceTypes?.desktop as number) + isDesktop,
+      mobile: (url.deviceTypes?.mobile as number) + isMobile,
+    },
     totalVisits: url.totalVisits + 1,
     uniqueVisits: url.uniqueVisits + uniqueVisitor,
     visitHistory: [...url.visitHistory, { clientIp, userAgent }],
   };
-  
 
   await Url.findOneAndUpdate({ shortCode: shortCode }, updated);
 };
+
+
 
 try {
   const urlVisitWorker = new Worker("visit-processing-queue", processUrlVisit, {

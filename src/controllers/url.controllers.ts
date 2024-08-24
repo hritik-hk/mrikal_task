@@ -4,6 +4,7 @@ import { RETRIES } from "../constants.js";
 import Url from "../model/url.model.js";
 import visitQueue from "../services/visitQueue.js";
 import { redis } from "../index.js";
+import userAgentParser from "ua-parser-js";
 
 const createRandomShortUrl = async (req: Request, res: Response) => {
   try {
@@ -72,6 +73,8 @@ const redirectToOriginalUrl = async (req: Request, res: Response) => {
     //find in redis
     //@ts-ignore
     const longUrl = await redis.get(shortCode);
+    const parser = new userAgentParser(req.headers["user-agent"]);
+    const result = parser.getResult();
 
     // To Do: refactor code- remove repition
     if (longUrl) {
@@ -79,6 +82,7 @@ const redirectToOriginalUrl = async (req: Request, res: Response) => {
       //push visit update to queue
       visitQueue.add("visit-processing-queue", {
         shortCode: shortCode,
+        deviceType: result.device.type,
         clientIp: req.clientIp,
         userAgent: req.headers["user-agent"],
       });
@@ -97,12 +101,13 @@ const redirectToOriginalUrl = async (req: Request, res: Response) => {
     //push visit update to queue
     visitQueue.add("visit-processing-queue", {
       shortCode: shortCode,
+      deviceType: result.device.type,
       clientIp: req.clientIp,
       userAgent: req.headers["user-agent"],
     });
 
     //add url to redis
-    redis.set(shortCode, url.originalUrl);
+    await redis.set(shortCode, url.originalUrl);
 
     return res.status(302).redirect(url.originalUrl as string);
   } catch (error) {
