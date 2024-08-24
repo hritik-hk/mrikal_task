@@ -1,16 +1,19 @@
-const mongoose = require("mongoose");
-require("dotenv").config();
+import mongoose from "mongoose";
 
 const DB_URL = process.env.DB_URL;
 
-async function main() {
+async function connectToDB() {
   try {
-    await mongoose.connect(DB_URL);
-    console.log("Connected to the database");
+    if (DB_URL) {
+      await mongoose.connect(DB_URL);
+      console.log("Connected to the database");
+    } else {
+      throw new Error("DB connection string not found");
+    }
   } catch (error) {
     console.error("Error connecting to the database:", error);
   }
 }
 
 // exporting the connection
-exports.connectToDB = main;
+export default connectToDB;
