@@ -6,6 +6,7 @@ This project is a backend API for a URL shortener service with advanced features
 - **URL Shortening** with custom short codes
 - **Analytics** for tracking visits
 - **Caching** for optimizing performance
+- **API Rate Limiting** to prevent abuse
 - **Background Jobs** for updating and maintaing Analytics
 
 The API is designed to be robust, scalable, and easy to integrate with other services.
@@ -15,6 +16,7 @@ The API is designed to be robust, scalable, and easy to integrate with other ser
 - [Getting Started](#getting-started)
 - [API Endpoints](#api-endpoints)
 - [Redis Caching](#redis-caching)
+- [API Rate Limiting](#api-rate-limiting)
 - [Background Workers](#background-workers)
 
 ### Getting Started
@@ -29,8 +31,8 @@ The API is designed to be robust, scalable, and easy to integrate with other ser
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/url-shortener.git
-   cd url-shortener
+   git clone https://github.com/hritik-hk/shrinkly.git
+   cd shrinkly
    ```
 2. Install dependencies:
 ```bash
@@ -38,7 +40,7 @@ The API is designed to be robust, scalable, and easy to integrate with other ser
 ```
 3. Set up environment variables in a .env file:
 ```
-MONGODB_URI=<your-mongodb-uri>
+DB_URL=<your-mongodb-uri>
 REDIS_URL=<your-redis-url>
 PORT=8080
 ```
@@ -56,7 +58,7 @@ Request body:
 ```
 {
   "originalUrl": "https://example.com",
-  "customCode": "my-code", 
+  "customCode": "mycodex", 
 }
  ```
 #### GET /:shortCode
@@ -82,6 +84,10 @@ shortCode": string,
 ```
 ### Redis Caching
 - caches frequency used results in memory redis database/store
+
+### API Rate Limiting
+- API rate limiting on basis of requested URL and IP address
+- used redis to maintain request count and TTL
 
 ### Background Workers
 - processes jobs/updates from queue and updates database asynchronously
