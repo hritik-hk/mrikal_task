@@ -44,7 +44,13 @@ const createRandomShortUrl = async (req: Request, res: Response) => {
 const createCustomShortUrl = async (req: Request, res: Response) => {
   try {
     const originalUrl = req.body.originalUrl;
-    const customCode = req.body.customrUrl;
+    const customCode = req.body.customCode;
+
+    if (customCode === "") {
+      return res
+        .status(400)
+        .json({ error: "your custom code cannot be empty!" });
+    }
 
     const url = await Url.findOne({ shortCode: customCode });
 
@@ -57,6 +63,8 @@ const createCustomShortUrl = async (req: Request, res: Response) => {
       originalUrl: originalUrl,
       visitHistory: [],
     });
+
+    const doc = await newUrl.save();
 
     return res.status(200).json({ shortUrl: newUrl.shortCode });
   } catch (error) {
